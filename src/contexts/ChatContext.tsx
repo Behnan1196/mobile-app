@@ -37,32 +37,44 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   // Connect to chat with assigned partner
   const connectToChat = async (user: User, partner: User) => {
     try {
+      console.log('🔗 Starting chat connection...');
+      console.log('👤 User:', user.name, user.role);
+      console.log('🤝 Partner:', partner.name, partner.role);
+      
       setIsLoading(true);
       setError(null);
 
       // Initialize Stream Chat
+      console.log('🚀 Initializing Stream Chat...');
       await streamChatService.initialize(user);
 
       // Determine student and coach IDs
       const studentId = user.role === 'student' ? user.id : partner.id;
       const coachId = user.role === 'coach' ? user.id : partner.id;
+      console.log('📋 Student ID:', studentId);
+      console.log('👨‍🏫 Coach ID:', coachId);
 
       // Get or create chat channel
+      console.log('📺 Getting/creating chat channel...');
       const channel = await streamChatService.getOrCreateChannel(studentId, coachId);
       setCurrentChannel(channel);
 
       // Get existing messages
+      console.log('📨 Loading existing messages...');
       const existingMessages = await streamChatService.getMessages(channel.id || '');
       setMessages(existingMessages);
 
       // Set up real-time message listeners
+      console.log('👂 Setting up message listeners...');
       setupMessageListeners(channel);
 
       setIsConnected(true);
-      console.log('Chat connected successfully');
+      console.log('✅ Chat connected successfully');
     } catch (error) {
-      console.error('Error connecting to chat:', error);
-      setError(error instanceof Error ? error.message : 'Failed to connect to chat');
+      console.error('❌ Error connecting to chat:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to connect to chat';
+      console.error('❌ Error message:', errorMessage);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

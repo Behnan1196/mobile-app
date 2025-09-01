@@ -12,6 +12,9 @@ class StreamChatService {
   // Get user token from server
   private async getUserToken(user: User): Promise<string> {
     try {
+      console.log('🔑 Requesting Stream token for user:', user.name);
+      console.log('🌐 API URL:', API_URL);
+      
       const response = await fetch(`${API_URL}/api/stream-token`, {
         method: 'POST',
         headers: {
@@ -25,28 +28,40 @@ class StreamChatService {
         }),
       });
 
+      console.log('📡 Token response status:', response.status);
+      console.log('📡 Token response ok:', response.ok);
+
       if (!response.ok) {
-        throw new Error(`Failed to get token: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('❌ Token request failed:', errorText);
+        throw new Error(`Failed to get token: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('✅ Token received successfully');
       return data.token;
     } catch (error) {
-      console.error('Error getting user token:', error);
-      throw new Error('Failed to get authentication token');
+      console.error('❌ Error getting user token:', error);
+      throw new Error(`Failed to get authentication token: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   // Initialize Stream Chat client
   async initialize(user: User) {
     try {
+      console.log('🚀 Initializing Stream Chat for user:', user.name);
+      console.log('🔑 Stream API Key:', STREAM_API_KEY ? 'Present' : 'Missing');
+      console.log('🌐 API URL:', API_URL);
+      
       this.currentUser = user;
       
       // Create Stream Chat client
       this.client = StreamChat.getInstance(STREAM_API_KEY);
+      console.log('📱 Stream Chat client created');
       
       // Get user token from server
       const token = await this.getUserToken(user);
+      console.log('🔑 Token obtained, connecting user...');
       
       // Connect user to Stream
       await this.client.connectUser(
@@ -59,10 +74,17 @@ class StreamChatService {
         token
       );
 
-      console.log('Stream Chat connected successfully for user:', user.name);
+      console.log('✅ Stream Chat connected successfully for user:', user.name);
       return this.client;
     } catch (error) {
-      console.error('Error initializing Stream Chat:', error);
+      console.error('❌ Error initializing Stream Chat:', error);
+      console.error('❌ Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        user: user.name,
+        apiKey: STREAM_API_KEY ? 'Present' : 'Missing',
+        apiUrl: API_URL
+      });
       throw error;
     }
   }

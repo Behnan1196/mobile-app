@@ -39,10 +39,25 @@ const ChatScreen: React.FC = () => {
 
   // Connect to chat when component mounts
   useEffect(() => {
-    if (user && partner && !isConnected) {
+    console.log('🔍 ChatScreen useEffect triggered');
+    console.log('👤 User:', user?.name);
+    console.log('🤝 Partner:', partner?.name);
+    console.log('🔗 IsConnected:', isConnected);
+    console.log('⏳ IsLoading:', isLoading);
+    
+    if (user && partner && !isConnected && !isLoading) {
+      console.log('🚀 Starting chat connection from ChatScreen...');
       connectToChat(user, partner);
     }
-  }, [user, partner, isConnected]);
+  }, [user, partner]); // Removed isConnected from dependencies to prevent loops
+
+  // Cleanup when component unmounts
+  useEffect(() => {
+    return () => {
+      console.log('🧹 ChatScreen unmounting, disconnecting chat...');
+      // Note: We don't disconnect here as the ChatContext handles cleanup
+    };
+  }, []);
 
   // Handle sending message
   const handleSendMessage = async () => {
@@ -84,6 +99,17 @@ const ChatScreen: React.FC = () => {
           </View>
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Connecting to chat with {partner.name}...</Text>
+            <TouchableOpacity 
+              style={[styles.retryButton, { marginTop: 20 }]}
+              onPress={() => {
+                console.log('🔄 Force retry from loading state...');
+                if (user && partner) {
+                  connectToChat(user, partner);
+                }
+              }}
+            >
+              <Text style={styles.retryButtonText}>Force Retry</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>
@@ -104,7 +130,12 @@ const ChatScreen: React.FC = () => {
             <Text style={styles.errorText}>Error: {error}</Text>
             <TouchableOpacity 
               style={styles.retryButton}
-              onPress={() => user && partner && connectToChat(user, partner)}
+              onPress={() => {
+                console.log('🔄 Retrying chat connection...');
+                if (user && partner) {
+                  connectToChat(user, partner);
+                }
+              }}
             >
               <Text style={styles.retryButtonText}>Retry Connection</Text>
             </TouchableOpacity>

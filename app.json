@@ -20,7 +20,17 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.behnan.coachingapp"
+      "bundleIdentifier": "com.behnan.coachingapp",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            }
+          }
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
