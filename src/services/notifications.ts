@@ -54,6 +54,18 @@ class MobileNotificationService {
     this.initializeChannels();
     // Request permissions immediately
     this.requestPermissions();
+    // Initialize the service immediately (don't wait for user)
+    this.initializeService();
+  }
+
+  /**
+   * Initialize the notification service immediately (without user)
+   */
+  private initializeService(): void {
+    console.log('🚀 Initializing notification service immediately...');
+    // The service is ready to handle notifications as soon as it's created
+    // Channels and permissions are already set up in constructor
+    console.log('✅ Notification service ready for immediate use');
   }
 
   /**
