@@ -23,7 +23,9 @@
     "react-native-safe-area-context": "^5.6.1",
     "react-native-screens": "^4.15.4",
     "stream-chat": "^9.18.1",
-    "stream-chat-react-native": "^8.5.0"
+    "stream-chat-react-native": "^8.5.0",
+    "expo-dev-client": "~5.2.4",
+    "expo-task-manager": "~13.1.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

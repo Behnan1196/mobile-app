@@ -1,13 +1,13 @@
 {
   "expo": {
     "name": "Coaching App",
-    "slug": "coaching-app",
+    "slug": "sablon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "owner": "behnan",
+    "owner": "behzat",
     "extra": {
       "eas": {
         "projectId": "0b0622bd-fed2-443c-94c7-49cec61e014f"
@@ -29,7 +29,8 @@
               "NSExceptionAllowsInsecureHTTPLoads": true
             }
           }
-        }
+        },
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -43,12 +44,18 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "notification": {
+      "icon": "./assets/icon.png",
+      "color": "#ffffff",
+      "iosDisplayInForeground": true
+    },
     "plugins": [
       [
         "expo-notifications",
         {
-          "icon": "./assets/notification-icon.png",
-          "color": "#ffffff"
+          "icon": "./assets/icon.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/notification.wav"]
         }
       ]
     ]
