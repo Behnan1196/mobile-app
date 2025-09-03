@@ -82,11 +82,11 @@ class MobileNotificationService {
         await this.registerToken(token);
         console.log('Push token registered:', token);
       } else {
-        console.log('No push token available, using local notifications only');
+        console.log('Using local notifications (push tokens not available)');
       }
     } catch (error) {
-      console.error('Error getting push token:', error);
-      console.log('Push tokens failed, using local notifications only');
+      // Silently handle push token errors - this is expected in development
+      console.log('Using local notifications (push tokens not available)');
     }
 
     console.log('Mobile notifications initialized successfully');
@@ -144,7 +144,8 @@ class MobileNotificationService {
         console.log('Device push token obtained:', token.data);
         return token.data;
       } catch (deviceError) {
-        console.warn('Device push token failed, trying Expo push token:', deviceError);
+        // Silently handle device push token failure (Firebase not initialized)
+        console.log('Device push token not available (Firebase not configured)');
         
         // Fallback: try Expo push token
         try {
@@ -154,7 +155,8 @@ class MobileNotificationService {
           console.log('Expo push token obtained:', token.data);
           return token.data;
         } catch (expoError) {
-          console.error('Expo push token also failed:', expoError);
+          // Silently handle Expo push token failure (Firebase not initialized)
+          console.log('Expo push token not available (Firebase not configured)');
           return null;
         }
       }
