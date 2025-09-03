@@ -232,11 +232,15 @@ class MobileNotificationService {
    * Handle incoming chat message (for local notifications when push tokens fail)
    */
   async handleIncomingMessage(message: any, sender: any): Promise<void> {
+    console.log('🔔 handleIncomingMessage called, isInChat:', this.isInChat);
+    
     // Only show local notification if user is not in chat
     if (this.isInChat) {
+      console.log('🔔 User is in chat, skipping notification');
       return;
     }
 
+    console.log('🔔 User not in chat, showing local notification');
     try {
       await this.scheduleLocalNotification(
         `New message from ${sender.name}`,
@@ -250,6 +254,7 @@ class MobileNotificationService {
         0, // Show immediately
         'chat'
       );
+      console.log('🔔 Local notification scheduled successfully');
     } catch (error) {
       console.error('Error showing local notification:', error);
     }

@@ -15,6 +15,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
+import { mobileNotificationService } from '../services/notifications';
 import { User } from '../types';
 
 interface ChatScreenRouteParams {
@@ -50,6 +51,19 @@ const ChatScreen: React.FC = () => {
       connectToChat(user, partner);
     }
   }, [user, partner]); // Removed isConnected from dependencies to prevent loops
+
+  // Track chat activity for notifications
+  useEffect(() => {
+    // Set user as in chat when component mounts
+    mobileNotificationService.setChatActivity(true);
+    console.log('📱 Set chat activity: true');
+    
+    // Set user as not in chat when component unmounts
+    return () => {
+      mobileNotificationService.setChatActivity(false);
+      console.log('📱 Set chat activity: false');
+    };
+  }, []);
 
   // Cleanup when component unmounts
   useEffect(() => {
