@@ -96,13 +96,12 @@ class MobileNotificationService {
       const token = await this.getPushToken();
       if (token) {
         await this.registerToken(token);
-        console.log('Push token registered:', token);
+        console.log('✅ Push token registered successfully:', token);
       } else {
-        console.log('Using local notifications (push tokens not available)');
+        console.log('⚠️ Using local notifications (push tokens not available)');
       }
     } catch (error) {
-      // Silently handle push token errors - this is expected in development
-      console.log('Using local notifications (push tokens not available)');
+      console.log('⚠️ Using local notifications (push token error):', error);
     }
 
     console.log('Mobile notifications initialized successfully');
@@ -214,25 +213,16 @@ class MobileNotificationService {
         return null;
       }
 
-      // Try Expo push token first (this should work without Firebase)
+      // Use Expo push token (works in development and production)
       try {
         const token = await Notifications.getExpoPushTokenAsync({
           projectId: '0b0622bd-fed2-443c-94c7-49cec61e014f', // From app.json
         });
-        console.log('Expo push token obtained:', token.data);
+        console.log('✅ Expo push token obtained:', token.data);
         return token.data;
       } catch (expoError) {
-        console.log('Expo push token not available (Firebase not configured)');
-        
-        // Fallback: try device push token
-        try {
-          const token = await Notifications.getDevicePushTokenAsync();
-          console.log('Device push token obtained:', token.data);
-          return token.data;
-        } catch (deviceError) {
-          console.log('Device push token not available (Firebase not configured)');
-          return null;
-        }
+        console.log('❌ Expo push token failed:', expoError);
+        return null;
       }
     } catch (error) {
       console.error('Error getting push token:', error);
