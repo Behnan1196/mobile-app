@@ -75,18 +75,18 @@ class MobileNotificationService {
       return;
     }
 
-    console.log('Mobile notifications initialized successfully (push tokens disabled)');
-    
-    // TODO: Re-enable push tokens once Firebase issue is resolved
-    // try {
-    //   const token = await this.getPushToken();
-    //   if (token) {
-    //     await this.registerToken(token);
-    //     console.log('Push token registered:', token);
-    //   }
-    // } catch (error) {
-    //   console.error('Error getting push token:', error);
-    // }
+    // Try to get push token for mobile notifications
+    try {
+      const token = await this.getPushToken();
+      if (token) {
+        await this.registerToken(token);
+        console.log('Push token registered:', token);
+      }
+    } catch (error) {
+      console.error('Error getting push token:', error);
+    }
+
+    console.log('Mobile notifications initialized successfully');
   }
 
   /**
@@ -135,21 +135,23 @@ class MobileNotificationService {
         return null;
       }
 
-      // Try to get Expo push token first
+      // Try to get device push token first (this might work without Firebase)
       try {
-        const token = await Notifications.getExpoPushTokenAsync({
-          projectId: '0b0622bd-fed2-443c-94c7-49cec61e014f', // From app.json
-        });
+        const token = await Notifications.getDevicePushTokenAsync();
+        console.log('Device push token obtained:', token.data);
         return token.data;
-      } catch (expoError) {
-        console.warn('Expo push token failed, trying alternative method:', expoError);
+      } catch (deviceError) {
+        console.warn('Device push token failed, trying Expo push token:', deviceError);
         
-        // Fallback: try to get device push token without Firebase
+        // Fallback: try Expo push token
         try {
-          const token = await Notifications.getDevicePushTokenAsync();
+          const token = await Notifications.getExpoPushTokenAsync({
+            projectId: '0b0622bd-fed2-443c-94c7-49cec61e014f', // From app.json
+          });
+          console.log('Expo push token obtained:', token.data);
           return token.data;
-        } catch (deviceError) {
-          console.error('Device push token also failed:', deviceError);
+        } catch (expoError) {
+          console.error('Expo push token also failed:', expoError);
           return null;
         }
       }
