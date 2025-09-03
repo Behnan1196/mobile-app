@@ -94,12 +94,24 @@ class MobileNotificationService {
         return null;
       }
 
-      // Use Expo push token instead of FCM
-      const token = await Notifications.getExpoPushTokenAsync({
-        projectId: '0b0622bd-fed2-443c-94c7-49cec61e014f', // From app.json
-      });
-
-      return token.data;
+      // Try to get Expo push token first
+      try {
+        const token = await Notifications.getExpoPushTokenAsync({
+          projectId: '0b0622bd-fed2-443c-94c7-49cec61e014f', // From app.json
+        });
+        return token.data;
+      } catch (expoError) {
+        console.warn('Expo push token failed, trying alternative method:', expoError);
+        
+        // Fallback: try to get device push token without Firebase
+        try {
+          const token = await Notifications.getDevicePushTokenAsync();
+          return token.data;
+        } catch (deviceError) {
+          console.error('Device push token also failed:', deviceError);
+          return null;
+        }
+      }
     } catch (error) {
       console.error('Error getting push token:', error);
       return null;
