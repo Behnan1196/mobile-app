@@ -51,7 +51,7 @@ class MobileNotificationService {
   constructor() {
     this.setupNotificationListeners();
     // Create notification channels immediately when service is created
-    this.createNotificationChannels();
+    this.initializeChannels();
   }
 
   /**
@@ -92,6 +92,41 @@ class MobileNotificationService {
     }
 
     console.log('Mobile notifications initialized successfully');
+  }
+
+  /**
+   * Initialize notification channels immediately (synchronous)
+   */
+  private initializeChannels(): void {
+    if (Platform.OS === 'android') {
+      console.log('🔧 Creating notification channels immediately...');
+      // Create channels immediately without waiting
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'Default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+        sound: 'default',
+      }).catch(console.error);
+
+      Notifications.setNotificationChannelAsync('chat', {
+        name: 'Chat Messages',
+        description: 'Notifications for new chat messages',
+        importance: Notifications.AndroidImportance.HIGH,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+        sound: 'default',
+      }).catch(console.error);
+
+      Notifications.setNotificationChannelAsync('general', {
+        name: 'General',
+        description: 'General app notifications',
+        importance: Notifications.AndroidImportance.DEFAULT,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+        sound: 'default',
+      }).catch(console.error);
+    }
   }
 
   /**
