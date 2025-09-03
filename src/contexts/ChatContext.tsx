@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { streamChatService } from '../services/streamChat';
+import { mobileNotificationService } from '../services/notifications';
 import { User } from '../types';
 
 interface ChatContextType {
@@ -87,6 +88,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       channel.on('message.new', (event: any) => {
         console.log('New message received:', event.message);
         setMessages(prev => [event.message, ...prev]);
+        
+        // Show local notification if push tokens aren't available
+        mobileNotificationService.handleIncomingMessage(event.message, event.message.user);
       });
 
       // Listen for message updates

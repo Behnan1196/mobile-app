@@ -81,9 +81,12 @@ class MobileNotificationService {
       if (token) {
         await this.registerToken(token);
         console.log('Push token registered:', token);
+      } else {
+        console.log('No push token available, using local notifications only');
       }
     } catch (error) {
       console.error('Error getting push token:', error);
+      console.log('Push tokens failed, using local notifications only');
     }
 
     console.log('Mobile notifications initialized successfully');
@@ -223,6 +226,33 @@ class MobileNotificationService {
    */
   setChatActivity(isInChat: boolean): void {
     this.updateActivity(isInChat);
+  }
+
+  /**
+   * Handle incoming chat message (for local notifications when push tokens fail)
+   */
+  async handleIncomingMessage(message: any, sender: any): Promise<void> {
+    // Only show local notification if user is not in chat
+    if (this.isInChat) {
+      return;
+    }
+
+    try {
+      await this.scheduleLocalNotification(
+        `New message from ${sender.name}`,
+        message.text.length > 100 ? message.text.substring(0, 100) + '...' : message.text,
+        {
+          channelId: message.cid,
+          messageId: message.id,
+          senderId: sender.id,
+          type: 'chat_message'
+        },
+        0, // Show immediately
+        'chat'
+      );
+    } catch (error) {
+      console.error('Error showing local notification:', error);
+    }
   }
 
   /**
