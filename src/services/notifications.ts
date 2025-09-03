@@ -58,6 +58,9 @@ class MobileNotificationService {
   async initialize(userId: string): Promise<void> {
     this.currentUserId = userId;
     
+    // Create notification channels for Android
+    await this.createNotificationChannels();
+    
     // Request notification permissions
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
@@ -72,7 +75,6 @@ class MobileNotificationService {
       return;
     }
 
-    // Skip push token for now to avoid Firebase issues
     console.log('Mobile notifications initialized successfully (push tokens disabled)');
     
     // TODO: Re-enable push tokens once Firebase issue is resolved
@@ -85,6 +87,42 @@ class MobileNotificationService {
     // } catch (error) {
     //   console.error('Error getting push token:', error);
     // }
+  }
+
+  /**
+   * Create notification channels for Android
+   */
+  private async createNotificationChannels(): Promise<void> {
+    if (Platform.OS === 'android') {
+      // Create default channel
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'Default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+        sound: 'default',
+      });
+
+      // Create chat channel
+      await Notifications.setNotificationChannelAsync('chat', {
+        name: 'Chat Messages',
+        description: 'Notifications for new chat messages',
+        importance: Notifications.AndroidImportance.HIGH,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+        sound: 'default',
+      });
+
+      // Create general channel
+      await Notifications.setNotificationChannelAsync('general', {
+        name: 'General',
+        description: 'General app notifications',
+        importance: Notifications.AndroidImportance.DEFAULT,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+        sound: 'default',
+      });
+    }
   }
 
   /**
@@ -303,7 +341,8 @@ class MobileNotificationService {
     title: string,
     body: string,
     data?: any,
-    seconds: number = 0
+    seconds: number = 0,
+    channelId: string = 'default'
   ): Promise<string> {
     const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
@@ -311,6 +350,7 @@ class MobileNotificationService {
         body,
         data,
         sound: 'default',
+        ...(Platform.OS === 'android' && { channelId }),
       },
       trigger: seconds > 0 ? { seconds } : null,
     });
