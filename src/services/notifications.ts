@@ -52,6 +52,8 @@ class MobileNotificationService {
     this.setupNotificationListeners();
     // Create notification channels immediately when service is created
     this.initializeChannels();
+    // Request permissions immediately
+    this.requestPermissions();
   }
 
   /**
@@ -127,6 +129,31 @@ class MobileNotificationService {
         sound: 'default',
       }).catch(console.error);
     }
+  }
+
+  /**
+   * Request notification permissions immediately (synchronous)
+   */
+  private requestPermissions(): void {
+    console.log('🔐 Requesting notification permissions immediately...');
+    Notifications.getPermissionsAsync().then(({ status }) => {
+      console.log('🔐 Current permission status:', status);
+      if (status !== 'granted') {
+        console.log('🔐 Requesting notification permissions...');
+        return Notifications.requestPermissionsAsync();
+      }
+      console.log('🔐 Notification permissions already granted');
+      return { status };
+    }).then(({ status }) => {
+      console.log('🔐 Final permission status:', status);
+      if (status === 'granted') {
+        console.log('✅ Notification permissions granted');
+      } else {
+        console.warn('❌ Notification permissions denied');
+      }
+    }).catch((error) => {
+      console.error('🔐 Error requesting permissions:', error);
+    });
   }
 
   /**
@@ -275,6 +302,17 @@ class MobileNotificationService {
     if (this.isInChat) {
       console.log('🔔 User is in chat, skipping notification');
       return;
+    }
+
+    // Check if we have notification permissions
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('🔔 No notification permissions, requesting...');
+      const { status: newStatus } = await Notifications.requestPermissionsAsync();
+      if (newStatus !== 'granted') {
+        console.warn('🔔 Notification permissions denied, cannot show notification');
+        return;
+      }
     }
 
     console.log('🔔 User not in chat, showing local notification');
