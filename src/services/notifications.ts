@@ -50,6 +50,8 @@ class MobileNotificationService {
 
   constructor() {
     this.setupNotificationListeners();
+    // Create notification channels immediately when service is created
+    this.createNotificationChannels();
   }
 
   /**
@@ -58,7 +60,7 @@ class MobileNotificationService {
   async initialize(userId: string): Promise<void> {
     this.currentUserId = userId;
     
-    // Create notification channels for Android
+    // Always create notification channels first (even before permissions)
     await this.createNotificationChannels();
     
     // Request notification permissions
@@ -138,25 +140,23 @@ class MobileNotificationService {
         return null;
       }
 
-      // Try to get device push token first (this might work without Firebase)
+      // Try Expo push token first (this should work without Firebase)
       try {
-        const token = await Notifications.getDevicePushTokenAsync();
-        console.log('Device push token obtained:', token.data);
+        const token = await Notifications.getExpoPushTokenAsync({
+          projectId: '0b0622bd-fed2-443c-94c7-49cec61e014f', // From app.json
+        });
+        console.log('Expo push token obtained:', token.data);
         return token.data;
-      } catch (deviceError) {
-        // Silently handle device push token failure (Firebase not initialized)
-        console.log('Device push token not available (Firebase not configured)');
+      } catch (expoError) {
+        console.log('Expo push token not available (Firebase not configured)');
         
-        // Fallback: try Expo push token
+        // Fallback: try device push token
         try {
-          const token = await Notifications.getExpoPushTokenAsync({
-            projectId: '0b0622bd-fed2-443c-94c7-49cec61e014f', // From app.json
-          });
-          console.log('Expo push token obtained:', token.data);
+          const token = await Notifications.getDevicePushTokenAsync();
+          console.log('Device push token obtained:', token.data);
           return token.data;
-        } catch (expoError) {
-          // Silently handle Expo push token failure (Firebase not initialized)
-          console.log('Expo push token not available (Firebase not configured)');
+        } catch (deviceError) {
+          console.log('Device push token not available (Firebase not configured)');
           return null;
         }
       }
