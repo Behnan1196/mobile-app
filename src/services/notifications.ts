@@ -72,16 +72,19 @@ class MobileNotificationService {
       return;
     }
 
-    // Get push token
-    try {
-      const token = await this.getPushToken();
-      if (token) {
-        await this.registerToken(token);
-        console.log('Push token registered:', token);
-      }
-    } catch (error) {
-      console.error('Error getting push token:', error);
-    }
+    // Skip push token for now to avoid Firebase issues
+    console.log('Mobile notifications initialized successfully (push tokens disabled)');
+    
+    // TODO: Re-enable push tokens once Firebase issue is resolved
+    // try {
+    //   const token = await this.getPushToken();
+    //   if (token) {
+    //     await this.registerToken(token);
+    //     console.log('Push token registered:', token);
+    //   }
+    // } catch (error) {
+    //   console.error('Error getting push token:', error);
+    // }
   }
 
   /**
