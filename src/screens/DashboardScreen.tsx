@@ -13,6 +13,7 @@ import { getAssignedPartner } from '../services/assignments';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { User } from '../types';
+import { NotificationTest } from '../components/NotificationTest';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -96,6 +97,8 @@ export default function DashboardScreen() {
           <Text style={styles.cardTitle}>Profile</Text>
           <Text style={styles.cardSubtitle}>Manage your account</Text>
         </TouchableOpacity>
+
+        <NotificationTest />
 
         {user?.role === 'coach' && (
           <TouchableOpacity style={styles.card}>

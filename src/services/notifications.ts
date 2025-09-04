@@ -2,7 +2,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import { supabase } from './supabase';
-import { fcmService } from './fcmService';
+import { truePushService } from './truePushService';
 
 export interface NotificationToken {
   id: string;
@@ -92,19 +92,19 @@ class MobileNotificationService {
       return;
     }
 
-    // Try FCM first (preferred for push notifications)
-    if (fcmService.isAvailable()) {
-      console.log('🔥 Initializing FCM...');
-      await fcmService.initialize(userId);
+    // Try true push notifications first
+    if (truePushService.isAvailable()) {
+      console.log('🚀 Initializing true push notifications...');
+      await truePushService.initialize(userId);
     } else {
-      console.log('📱 FCM not available, trying Expo push tokens...');
+      console.log('📱 True push not available, trying fallback...');
       
-      // Fallback to Expo push tokens
+      // Fallback to basic push tokens
       try {
         const token = await this.getPushToken();
         if (token) {
           await this.registerToken(token);
-          console.log('✅ Expo push token registered successfully:', token);
+          console.log('✅ Fallback push token registered successfully:', token);
         } else {
           console.log('⚠️ Using local notifications (push tokens not available)');
         }

@@ -39,8 +39,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.behnan.coachingapp",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.behnan.coachingapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -58,6 +57,16 @@
           "color": "#ffffff",
           "defaultChannel": "default",
           "androidMode": "default"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "default",
+          "androidMode": "default",
+          "useFirebase": true
         }
       ]
     ]
