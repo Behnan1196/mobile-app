@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { truePushService } from '../services/truePushService';
+import { backgroundNotificationService } from '../services/backgroundNotificationService';
 
 export const NotificationTest: React.FC = () => {
   const handleTestNotification = async () => {
@@ -9,6 +10,14 @@ export const NotificationTest: React.FC = () => {
       console.log('Test notification triggered');
     } catch (error) {
       console.error('Error triggering test notification:', error);
+    }
+  };
+
+  const handleTestBackgroundService = async () => {
+    try {
+      await backgroundNotificationService.testService();
+    } catch (error) {
+      console.error('Error testing background service:', error);
     }
   };
 
@@ -25,9 +34,17 @@ export const NotificationTest: React.FC = () => {
       >
         <Text style={styles.buttonText}>Test Notification</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.button, styles.secondaryButton]} 
+        onPress={handleTestBackgroundService}
+      >
+        <Text style={styles.buttonText}>Test Background Service</Text>
+      </TouchableOpacity>
       
       <Text style={styles.info}>
-        This will schedule a test notification in 2 seconds
+        Test notification: schedules in 2 seconds{'\n'}
+        Test background service: checks if service is ready
       </Text>
     </View>
   );
@@ -55,6 +72,9 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 10,
+  },
+  secondaryButton: {
+    backgroundColor: '#34C759',
   },
   buttonText: {
     color: 'white',

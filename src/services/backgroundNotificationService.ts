@@ -63,16 +63,26 @@ export class BackgroundNotificationService {
   private setupNotificationListeners(channel: any): void {
     try {
       console.log('👂 Setting up background notification listeners...');
+      console.log('📺 Channel ID:', channel.id);
+      console.log('📺 Channel type:', channel.type);
       
       // Listen for new messages
       channel.on('message.new', (event: any) => {
         console.log('📱 Background notification - New message received:', event.message);
+        console.log('📱 Message text:', event.message.text);
+        console.log('📱 Message user:', event.message.user.name);
         
         // Show local notification if push tokens aren't available
         mobileNotificationService.handleIncomingMessage(event.message, event.message.user);
       });
 
+      // Also listen for any channel events
+      channel.on('*', (event: any) => {
+        console.log('📱 Background notification - Channel event:', event.type, event);
+      });
+
       console.log('✅ Background notification listeners set up successfully');
+      console.log('🔔 Ready to receive notifications!');
     } catch (error) {
       console.error('❌ Error setting up background notification listeners:', error);
     }
@@ -104,6 +114,22 @@ export class BackgroundNotificationService {
    */
   isServiceInitialized(): boolean {
     return this.isInitialized;
+  }
+
+  /**
+   * Test the background notification service
+   */
+  async testService(): Promise<void> {
+    console.log('🧪 Testing background notification service...');
+    console.log('📊 Service initialized:', this.isInitialized);
+    console.log('👤 Current user:', this.currentUser?.name);
+    console.log('🤝 Current partner:', this.currentPartner?.name);
+    
+    if (this.isInitialized) {
+      console.log('✅ Background notification service is ready!');
+    } else {
+      console.log('❌ Background notification service is not initialized');
+    }
   }
 }
 
