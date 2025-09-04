@@ -56,18 +56,11 @@
           "icon": "./assets/icon.png",
           "color": "#ffffff",
           "defaultChannel": "default",
-          "androidMode": "default",
-          "sounds": []
+          "androidMode": "default"
         }
       ],
-      [
-        "@react-native-firebase/app",
-        {
-          "android": {
-            "googleServicesFile": "./google-services.json"
-          }
-        }
-      ]
+      "@react-native-firebase/app",
+      "./plugins/withAndroidManifest.js"
     ]
   }
 }
