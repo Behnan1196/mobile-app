@@ -1,5 +1,6 @@
 import messaging from '@react-native-firebase/messaging';
 import { Platform } from 'react-native';
+import * as Device from 'expo-device';
 
 class FCMService {
   private currentUserId: string | null = null;

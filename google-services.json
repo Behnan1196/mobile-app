@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "123456789",
-    "project_id": "your-project-id",
-    "storage_bucket": "your-project-id.appspot.com"
+    "project_number": "770265453337",
+    "project_id": "sablon-4d924",
+    "storage_bucket": "sablon-4d924.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789:android:abcdef123456",
+        "mobilesdk_app_id": "1:770265453337:android:45a22c1b3fc1aaffd8ab88",
         "android_client_info": {
           "package_name": "com.behnan.coachingapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "123456789-abcdef123456.apps.googleusercontent.com",
+          "client_id": "770265453337-abcdef123456.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "YOUR_FIREBASE_API_KEY"
+          "current_key": "AIzaSyBZrJtVRkcQSeRazVWILkaEAPvEFAHaeHc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "123456789-abcdef123456.apps.googleusercontent.com",
+              "client_id": "770265453337-abcdef123456.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
