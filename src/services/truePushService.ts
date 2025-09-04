@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import { fcmService } from './fcmService';
 
 export class TruePushService {
   private static instance: TruePushService;
@@ -24,26 +25,18 @@ export class TruePushService {
     this.currentUserId = userId;
     
     try {
-      // Request permission for notifications
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
+      // Check if this is a development build or production build
+      const isDevelopment = __DEV__ || process.env.NODE_ENV === 'development';
       
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus === 'granted') {
-        console.log('✅ Push notification permission granted');
-        
-        // Get push token
-        const token = await this.getPushToken();
-        if (token) {
-          await this.registerToken(token);
-          console.log('✅ Push token registered successfully:', token);
-        }
+      if (isDevelopment) {
+        console.log('📱 Development build detected - using mock token for testing');
+        const mockToken = `mock-token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        console.log('✅ Mock push token created:', mockToken);
+        await this.registerToken(mockToken);
       } else {
-        console.log('❌ Push notification permission denied');
+        console.log('📱 Production build detected - using FCM for real push notifications');
+        // Use FCM for production builds
+        await fcmService.initialize(userId);
       }
     } catch (error) {
       console.error('❌ Push notification initialization error:', error);

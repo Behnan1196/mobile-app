@@ -53,6 +53,14 @@
           "defaultChannel": "default",
           "androidMode": "default"
         }
+      ],
+      [
+        "@react-native-firebase/app",
+        {
+          "android": {
+            "googleServicesFile": "./google-services.json"
+          }
+        }
       ]
     ],
     "notification": {
