@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { fcmService } from './fcmService';
+import { apnsService } from './apnsService';
 
 export class TruePushService {
   private static instance: TruePushService;
@@ -34,9 +35,13 @@ export class TruePushService {
         console.log('✅ Mock push token created:', mockToken);
         await this.registerToken(mockToken);
       } else {
-        console.log('📱 Production build detected - using FCM for real push notifications');
-        // Use FCM for production builds
-        await fcmService.initialize(userId);
+        console.log('📱 Production build detected - using platform-specific push notifications');
+        // Use platform-specific services for production builds
+        if (Platform.OS === 'ios') {
+          await apnsService.initialize(userId);
+        } else {
+          await fcmService.initialize(userId);
+        }
       }
     } catch (error) {
       console.error('❌ Push notification initialization error:', error);
