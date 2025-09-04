@@ -21,6 +21,26 @@ export const NotificationTest: React.FC = () => {
     }
   };
 
+  const handleTestWebhook = async () => {
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/notifications/test-webhook`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: 'Test message from mobile app',
+          channelId: 'coaching-6dd5528d-83ba38a0',
+        }),
+      });
+
+      const result = await response.json();
+      console.log('Test webhook result:', result);
+    } catch (error) {
+      console.error('Error testing webhook:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Notification Test</Text>
@@ -41,10 +61,18 @@ export const NotificationTest: React.FC = () => {
       >
         <Text style={styles.buttonText}>Test Background Service</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.button, styles.tertiaryButton]} 
+        onPress={handleTestWebhook}
+      >
+        <Text style={styles.buttonText}>Test Webhook</Text>
+      </TouchableOpacity>
       
       <Text style={styles.info}>
         Test notification: schedules in 2 seconds{'\n'}
-        Test background service: checks if service is ready
+        Test background service: checks if service is ready{'\n'}
+        Test webhook: simulates incoming message
       </Text>
     </View>
   );
@@ -75,6 +103,9 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     backgroundColor: '#34C759',
+  },
+  tertiaryButton: {
+    backgroundColor: '#FF9500',
   },
   buttonText: {
     color: 'white',
