@@ -139,7 +139,7 @@ export class TruePushService {
       userId: this.currentUserId,
       token: token,
       platform: Platform.OS,
-      tokenType: token.startsWith('mock-') ? 'mock' : 'expo',
+      tokenType: 'expo', // Always use 'expo' for database compatibility
     };
 
     console.log('📱 Registering token:', tokenData);
