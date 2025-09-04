@@ -108,6 +108,20 @@ class FCMService {
       console.log('🔥 Foreground FCM message received:', remoteMessage);
       // Handle foreground notification here
     });
+
+    // Handle notification opened app
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log('🔥 Notification opened app:', remoteMessage);
+    });
+
+    // Handle notification when app is opened
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          console.log('🔥 Notification caused app to open:', remoteMessage);
+        }
+      });
   }
 
   /**

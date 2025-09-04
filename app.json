@@ -51,16 +51,13 @@
     },
     "plugins": [
       [
-        "expo-notifications",
+        "@react-native-firebase/app",
         {
-          "icon": "./assets/icon.png",
-          "color": "#ffffff",
-          "defaultChannel": "default",
-          "androidMode": "default"
+          "android": {
+            "googleServicesFile": "./google-services.json"
+          }
         }
-      ],
-      "@react-native-firebase/app",
-      "./plugins/withAndroidManifest.js"
+      ]
     ]
   }
 }
