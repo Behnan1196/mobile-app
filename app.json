@@ -39,7 +39,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.behnan.coachingapp"
+      "package": "com.behnan.coachingapp",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -54,14 +55,7 @@
           "androidMode": "default"
         }
       ],
-      [
-        "@react-native-firebase/app",
-        {
-          "android": {
-            "googleServicesFile": "./google-services.json"
-          }
-        }
-      ]
+      "@react-native-firebase/app"
     ],
     "notification": {
       "icon": "./assets/icon.png",
