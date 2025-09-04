@@ -20,7 +20,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.behnan.coachingapp.push",
+      "bundleIdentifier": "com.behnan.coachingapp",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSAppTransportSecurity": {
@@ -56,16 +56,18 @@
           "icon": "./assets/icon.png",
           "color": "#ffffff",
           "defaultChannel": "default",
-          "androidMode": "default"
+          "androidMode": "default",
+          "sounds": []
         }
       ],
-      "@react-native-firebase/app"
-    ],
-    "notification": {
-      "icon": "./assets/icon.png",
-      "color": "#ffffff",
-      "iosDisplayInForeground": true,
-      "androidMode": "default"
-    }
+      [
+        "@react-native-firebase/app",
+        {
+          "android": {
+            "googleServicesFile": "./google-services.json"
+          }
+        }
+      ]
+    ]
   }
 }
