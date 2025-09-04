@@ -60,11 +60,42 @@ export class TruePushService {
         return null;
       }
 
-      // For development builds, we'll use a mock token since real push tokens don't work
-      // In production builds (EAS), real push tokens will work
-      console.log('📱 Development build detected - using mock token for testing');
+      // Check if this is a development build or production build
+      const isDevelopment = __DEV__ || process.env.NODE_ENV === 'development';
+      
+      if (isDevelopment) {
+        console.log('📱 Development build detected - using mock token for testing');
+        const mockToken = `mock-token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        console.log('✅ Mock push token created:', mockToken);
+        return mockToken;
+      }
+      
+      console.log('📱 Production build detected - getting real push token');
+      
+      // Try Expo push token first
+      try {
+        const token = await Notifications.getExpoPushTokenAsync({
+          projectId: '0b0622bd-fed2-443c-94c7-49cec61e014f',
+        });
+        console.log('✅ Expo push token obtained:', token.data);
+        return token.data;
+      } catch (expoError) {
+        console.log('❌ Expo push token failed:', expoError);
+      }
+      
+      // Try device push token as fallback
+      try {
+        const token = await Notifications.getDevicePushTokenAsync();
+        console.log('✅ Device push token obtained:', token.data);
+        return token.data;
+      } catch (deviceError) {
+        console.log('❌ Device push token failed:', deviceError);
+      }
+      
+      // If both fail, fall back to mock token
+      console.log('⚠️ All push token methods failed, using mock token');
       const mockToken = `mock-token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      console.log('✅ Mock push token created:', mockToken);
+      console.log('✅ Mock push token created as fallback:', mockToken);
       return mockToken;
 
       // TODO: Uncomment this for production builds
