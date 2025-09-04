@@ -39,7 +39,10 @@ export class BackgroundNotificationService {
       await streamChatService.initialize(user);
       
       // Get the chat channel for notifications
-      const channel = await streamChatService.getChannel(user, partner);
+      // Determine student and coach IDs based on roles
+      const studentId = user.role === 'student' ? user.id : partner.id;
+      const coachId = user.role === 'coach' ? user.id : partner.id;
+      const channel = await streamChatService.getOrCreateChannel(studentId, coachId);
       
       if (channel) {
         // Set up message listeners for notifications
