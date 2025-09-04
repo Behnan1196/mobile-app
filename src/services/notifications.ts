@@ -92,12 +92,14 @@ class MobileNotificationService {
       return;
     }
 
-    // Try true push notifications first
-    if (truePushService.isAvailable()) {
-      console.log('🚀 Initializing true push notifications...');
-      await truePushService.initialize(userId);
-    } else {
-      console.log('📱 True push not available, trying fallback...');
+    // Use FCM for real push notifications
+    console.log('🚀 Initializing FCM push notifications...');
+    try {
+      const { fcmService } = await import('./fcmService');
+      await fcmService.initialize(userId);
+      console.log('✅ FCM push notifications initialized');
+    } catch (error) {
+      console.log('⚠️ FCM initialization failed, using local notifications:', error);
       
       // Fallback to basic push tokens
       try {
@@ -108,8 +110,8 @@ class MobileNotificationService {
         } else {
           console.log('⚠️ Using local notifications (push tokens not available)');
         }
-      } catch (error) {
-        console.log('⚠️ Using local notifications (push token error):', error);
+      } catch (fallbackError) {
+        console.log('⚠️ Using local notifications (push token error):', fallbackError);
       }
     }
 

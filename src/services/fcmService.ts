@@ -4,13 +4,18 @@ import * as Device from 'expo-device';
 
 class FCMService {
   private currentUserId: string | null = null;
+  private isInitialized = false;
 
   /**
-   * Initialize FCM service
+   * Initialize FCM service immediately (without user)
    */
-  async initialize(userId: string): Promise<void> {
-    this.currentUserId = userId;
-    console.log('🔥 Initializing FCM service for user:', userId);
+  async initializeImmediately(): Promise<void> {
+    if (this.isInitialized) {
+      console.log('🔥 FCM already initialized');
+      return;
+    }
+
+    console.log('🔥 Initializing FCM service immediately...');
 
     try {
       // Request permission
@@ -21,13 +26,34 @@ class FCMService {
 
       if (enabled) {
         console.log('✅ FCM permission granted');
-        await this.getToken();
         this.setupMessageHandlers();
+        this.isInitialized = true;
+        console.log('✅ FCM service ready for immediate use');
       } else {
         console.log('❌ FCM permission denied');
       }
     } catch (error) {
       console.error('❌ FCM initialization error:', error);
+    }
+  }
+
+  /**
+   * Initialize FCM service for specific user
+   */
+  async initialize(userId: string): Promise<void> {
+    this.currentUserId = userId;
+    console.log('🔥 Initializing FCM service for user:', userId);
+
+    // Initialize immediately if not done yet
+    if (!this.isInitialized) {
+      await this.initializeImmediately();
+    }
+
+    try {
+      // Get and register token for this user
+      await this.getToken();
+    } catch (error) {
+      console.error('❌ FCM user initialization error:', error);
     }
   }
 
@@ -97,21 +123,26 @@ class FCMService {
    * Setup message handlers
    */
   private setupMessageHandlers(): void {
-    // Handle background messages
-    messaging().setBackgroundMessageHandler(async remoteMessage => {
-      console.log('🔥 Background FCM message received:', remoteMessage);
-      // Handle background notification here
-    });
-
     // Handle foreground messages
     messaging().onMessage(async remoteMessage => {
       console.log('🔥 Foreground FCM message received:', remoteMessage);
-      // Handle foreground notification here
+      
+      // Show local notification when app is in foreground
+      if (remoteMessage.notification) {
+        console.log('📱 Showing foreground notification:', remoteMessage.notification);
+        // The notification will be shown automatically by FCM
+      }
     });
 
     // Handle notification opened app
     messaging().onNotificationOpenedApp(remoteMessage => {
       console.log('🔥 Notification opened app:', remoteMessage);
+      
+      // Handle navigation based on notification data
+      if (remoteMessage.data) {
+        console.log('📱 Notification data:', remoteMessage.data);
+        // Navigate to appropriate screen based on data
+      }
     });
 
     // Handle notification when app is opened
@@ -120,6 +151,12 @@ class FCMService {
       .then(remoteMessage => {
         if (remoteMessage) {
           console.log('🔥 Notification caused app to open:', remoteMessage);
+          
+          // Handle navigation based on notification data
+          if (remoteMessage.data) {
+            console.log('📱 Initial notification data:', remoteMessage.data);
+            // Navigate to appropriate screen based on data
+          }
         }
       });
   }
