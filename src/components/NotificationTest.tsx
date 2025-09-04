@@ -23,6 +23,7 @@ export const NotificationTest: React.FC = () => {
 
   const handleTestWebhook = async () => {
     try {
+      console.log('🧪 Testing webhook...');
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/notifications/test-webhook`, {
         method: 'POST',
         headers: {
@@ -34,10 +35,21 @@ export const NotificationTest: React.FC = () => {
         }),
       });
 
-      const result = await response.json();
-      console.log('Test webhook result:', result);
+      console.log('📡 Webhook response status:', response.status);
+      console.log('📡 Webhook response ok:', response.ok);
+      
+      const responseText = await response.text();
+      console.log('📡 Webhook response text:', responseText);
+      
+      try {
+        const result = JSON.parse(responseText);
+        console.log('✅ Test webhook result:', result);
+      } catch (parseError) {
+        console.error('❌ JSON parse error:', parseError);
+        console.log('📄 Raw response:', responseText);
+      }
     } catch (error) {
-      console.error('Error testing webhook:', error);
+      console.error('❌ Error testing webhook:', error);
     }
   };
 
