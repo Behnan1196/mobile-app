@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
-import { Notifications } from 'expo-notifications';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 
 export class FCMService {
   private static instance: FCMService;
@@ -18,51 +18,62 @@ export class FCMService {
   }
 
   /**
-   * Initialize FCM for the current user
+   * Initialize push notifications for the current user
    */
   async initialize(userId: string): Promise<void> {
     this.currentUserId = userId;
     
     try {
       // Request permission for notifications
-      const authStatus = await messaging().requestPermission();
-      const enabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
 
-      if (enabled) {
-        console.log('✅ FCM Authorization status:', authStatus);
+      if (finalStatus === 'granted') {
+        console.log('✅ Push notification permission granted');
         
-        // Get FCM token
-        const token = await this.getFCMToken();
+        // Get push token
+        const token = await this.getPushToken();
         if (token) {
           await this.registerToken(token);
-          console.log('✅ FCM token registered successfully:', token);
+          console.log('✅ Push token registered successfully:', token);
         }
       } else {
-        console.log('❌ FCM permission denied');
+        console.log('❌ Push notification permission denied');
       }
     } catch (error) {
-      console.error('❌ FCM initialization error:', error);
+      console.error('❌ Push notification initialization error:', error);
     }
   }
 
   /**
-   * Get FCM token
+   * Get push token
    */
-  private async getFCMToken(): Promise<string | null> {
+  private async getPushToken(): Promise<string | null> {
     try {
-      const token = await messaging().getToken();
-      console.log('✅ FCM token obtained:', token);
-      return token;
+      if (!Device.isDevice) {
+        console.warn('Must use physical device for push notifications');
+        return null;
+      }
+
+      // Use Expo push token (works in development and production)
+      const token = await Notifications.getExpoPushTokenAsync({
+        projectId: '0b0622bd-fed2-443c-94c7-49cec61e014f', // From app.json
+      });
+      console.log('✅ Expo push token obtained:', token.data);
+      return token.data;
     } catch (error) {
-      console.error('❌ FCM token error:', error);
+      console.error('❌ Push token error:', error);
       return null;
     }
   }
 
   /**
-   * Register FCM token in database
+   * Register push token in database
    */
   private async registerToken(token: string): Promise<void> {
     if (!this.currentUserId) {
@@ -80,68 +91,40 @@ export class FCMService {
           userId: this.currentUserId,
           token: token,
           platform: Platform.OS,
-          tokenType: 'fcm',
+          tokenType: 'expo',
         }),
       });
 
       if (response.ok) {
-        console.log('✅ FCM token registered in database');
+        console.log('✅ Push token registered in database');
       } else {
-        console.error('❌ Failed to register FCM token:', await response.text());
+        console.error('❌ Failed to register push token:', await response.text());
       }
     } catch (error) {
-      console.error('❌ Error registering FCM token:', error);
+      console.error('❌ Error registering push token:', error);
     }
   }
 
   /**
-   * Setup message handlers for FCM
+   * Setup message handlers for push notifications
    */
   private setupMessageHandlers(): void {
-    // Handle background messages
-    messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-      console.log('📱 FCM background message received:', remoteMessage);
-      
-      // Show local notification for background messages
-      if (remoteMessage.notification) {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: remoteMessage.notification.title || 'New Message',
-            body: remoteMessage.notification.body || 'You have a new message',
-            data: remoteMessage.data,
-          },
-          trigger: null, // Show immediately
-        });
-      }
+    // Handle notification received while app is running
+    Notifications.addNotificationReceivedListener(notification => {
+      console.log('📱 Push notification received while app is running:', notification);
     });
 
-    // Handle foreground messages
-    messaging().onMessage(async (remoteMessage) => {
-      console.log('📱 FCM foreground message received:', remoteMessage);
-      
-      // Show local notification for foreground messages
-      if (remoteMessage.notification) {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: remoteMessage.notification.title || 'New Message',
-            body: remoteMessage.notification.body || 'You have a new message',
-            data: remoteMessage.data,
-          },
-          trigger: null, // Show immediately
-        });
-      }
+    // Handle notification tapped
+    Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('📱 Push notification tapped:', response);
     });
   }
 
   /**
-   * Check if FCM is available
+   * Check if push notifications are available
    */
   isAvailable(): boolean {
-    try {
-      return messaging().isDeviceRegisteredForRemoteMessages !== undefined;
-    } catch {
-      return false;
-    }
+    return Device.isDevice;
   }
 }
 
