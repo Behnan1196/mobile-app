@@ -59,7 +59,8 @@
           "defaultChannel": "default",
           "androidMode": "default"
         }
-      ]
+      ],
+      "@react-native-firebase/app"
     ]
   }
 }
