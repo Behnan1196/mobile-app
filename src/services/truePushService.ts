@@ -104,24 +104,29 @@ export class TruePushService {
       return;
     }
 
+    const tokenData = {
+      userId: this.currentUserId,
+      token: token,
+      platform: Platform.OS,
+      tokenType: token.startsWith('mock-') ? 'mock' : 'expo',
+    };
+
+    console.log('📱 Registering token:', tokenData);
+
     try {
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/notifications/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          userId: this.currentUserId,
-          token: token,
-          platform: Platform.OS,
-          tokenType: token.startsWith('mock-') ? 'mock' : 'expo',
-        }),
+        body: JSON.stringify(tokenData),
       });
 
       if (response.ok) {
         console.log('✅ Push token registered in database');
       } else {
-        console.error('❌ Failed to register push token:', await response.text());
+        const errorText = await response.text();
+        console.error('❌ Failed to register push token:', errorText);
       }
     } catch (error) {
       console.error('❌ Error registering push token:', error);
