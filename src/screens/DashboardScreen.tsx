@@ -14,6 +14,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { User } from '../types';
 import { NotificationTest } from '../components/NotificationTest';
+import { backgroundNotificationService } from '../services/backgroundNotificationService';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -36,6 +37,12 @@ export default function DashboardScreen() {
       const partner = await getAssignedPartner(user!.id, user!.role);
       console.log('Assigned partner result:', partner);
       setAssignedPartner(partner);
+      
+      // Initialize background notifications when partner is loaded
+      if (partner && user) {
+        console.log('🚀 Initializing background notifications...');
+        await backgroundNotificationService.initialize(user, partner);
+      }
     } catch (error) {
       console.error('Error loading assigned partner:', error);
     } finally {
@@ -45,6 +52,8 @@ export default function DashboardScreen() {
 
   const handleSignOut = async () => {
     try {
+      // Clean up background notification service
+      await backgroundNotificationService.cleanup();
       await signOut();
     } catch (error) {
       console.error('Error signing out:', error);
