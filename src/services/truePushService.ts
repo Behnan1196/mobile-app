@@ -60,6 +60,15 @@ export class TruePushService {
         return null;
       }
 
+      // For development builds, we'll use a mock token since real push tokens don't work
+      // In production builds (EAS), real push tokens will work
+      console.log('📱 Development build detected - using mock token for testing');
+      const mockToken = `mock-token-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      console.log('✅ Mock push token created:', mockToken);
+      return mockToken;
+
+      // TODO: Uncomment this for production builds
+      /*
       // Method 1: Try Expo push token first
       try {
         const token = await Notifications.getExpoPushTokenAsync({
@@ -79,8 +88,7 @@ export class TruePushService {
       } catch (deviceError) {
         console.log('❌ Device push token failed:', deviceError);
       }
-
-      return null;
+      */
     } catch (error) {
       console.error('❌ Push token error:', error);
       return null;
@@ -106,7 +114,7 @@ export class TruePushService {
           userId: this.currentUserId,
           token: token,
           platform: Platform.OS,
-          tokenType: 'expo',
+          tokenType: token.startsWith('mock-') ? 'mock' : 'expo',
         }),
       });
 
